@@ -21,7 +21,9 @@ class HashTable:
     """
 
     def __init__(self, capacity):
-        # Your code here
+        self.capacity = capacity
+        self.size = 0
+        self.buckets = [None] * capacity
 
 
     def get_num_slots(self):
@@ -29,40 +31,26 @@ class HashTable:
         Return the length of the list you're using to hold the hash
         table data. (Not the number of items stored in the hash table,
         but the number of slots in the main list.)
-
-        One of the tests relies on this.
-
-        Implement this.
         """
-        # Your code here
+        return len(self.buckets)
 
 
     def get_load_factor(self):
         """
         Return the load factor for this hash table.
-
-        Implement this.
         """
-        # Your code here
+        # This is calculated by dividing the size of the table by the length that is in use
+        return float( (self.size) / len(self.storage) )
 
 
-    def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
-
-        Implement this, and/or DJB2.
-        """
-
-        # Your code here
-
-
-    def djb2(self, key):
-        """
-        DJB2 hash, 32-bit
-
-        Implement this, and/or FNV-1.
-        """
-        # Your code here
+    def fnv1(self, key, seed=0):
+        FNV_PRIME = 1099511628211
+        offset_basis = 14695981039346656037
+        hash = offset_basis + seed
+        for x in key:
+            hash = hash * FNV_PRIME
+            hash = hash ^ ord(x)
+        return hash
 
 
     def hash_index(self, key):
@@ -70,51 +58,84 @@ class HashTable:
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
-        return self.djb2(key) % self.capacity
+        return self.fnv1(key) % self.capacity
+
 
     def put(self, key, value):
         """
         Store the value with the given key.
-
         Hash collisions should be handled with Linked List Chaining.
-
-        Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+
+        if self.buckets[index] == None:
+            self.size += 1
+            self.buckets[index] = HashTableEntry(key, value)
+        else:
+            self.size += 1
+            node = self.buckets[index]
+            while True:
+                if node.key == key:
+                    node.key = key
+                    node.value = value
+                    return
+
+                if node.next == None:
+                    break
+
+                node = node.next
+            node.next = HashTableEntry(key, value)
 
 
     def delete(self, key):
         """
         Remove the value stored with the given key.
-
         Print a warning if the key is not found.
-
-        Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        node = self.buckets[index]
+        prev = None
+
+        while node is not None and node.key != key:
+            prev = node
+            node = node.next
+
+        if node is None:
+            return None
+        else:
+            self.size -= 1
+            result = node.value
+
+            if prev is None:
+                self.buckets[index] = node.next
+            else:
+                prev.next = prev.next.next
+
+            return result
 
 
     def get(self, key):
         """
         Retrieve the value stored with the given key.
-
         Returns None if the key is not found.
-
-        Implement this.
         """
-        # Your code here
+        index = self.hash_index(key)
+        node = self.buckets[index]
+
+        while node is not None and node.key != key:
+            node = node.next
+
+        if node is None:
+            return None
+        else:
+            return node.value
 
 
     def resize(self, new_capacity):
         """
         Changes the capacity of the hash table and
         rehashes all key/value pairs.
-
-        Implement this.
         """
-        # Your code here
-
 
 
 if __name__ == "__main__":
