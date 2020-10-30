@@ -66,6 +66,12 @@ class HashTable:
         Store the value with the given key.
         Hash collisions should be handled with Linked List Chaining.
         """
+
+        '''    DAY 1
+        self.buckets[self.hash_index(key)] = value
+        '''
+
+
         index = self.hash_index(key)
 
         if self.buckets[index] == None:
@@ -92,6 +98,14 @@ class HashTable:
         Remove the value stored with the given key.
         Print a warning if the key is not found.
         """
+
+        '''    DAY 1
+        self.buckets[self.hash_index(key)]
+        if value == None:
+            print('value is not found')
+        self.buckets[self.hash_index(key)] = None
+        '''
+
         index = self.hash_index(key)
         node = self.buckets[index]
         prev = None
@@ -119,6 +133,12 @@ class HashTable:
         Retrieve the value stored with the given key.
         Returns None if the key is not found.
         """
+
+        '''    DAY 1
+        return self.buckets[self.hash_index(key)]
+        '''
+
+
         index = self.hash_index(key)
         node = self.buckets[index]
 
