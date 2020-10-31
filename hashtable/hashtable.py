@@ -2,6 +2,7 @@ class HashTableEntry:
     """
     Linked List hash table key/value pair
     """
+
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -22,7 +23,9 @@ class HashTable:
 
     def __init__(self, capacity):
         # Your code here
-
+        self.capacity = capacity
+        self.size = 0
+        self.bucket = [None] * capacity
 
     def get_num_slots(self):
         """
@@ -35,7 +38,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
+        return (len(self.bucket))
 
     def get_load_factor(self):
         """
@@ -44,17 +47,7 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
-
-    def fnv1(self, key):
-        """
-        FNV-1 Hash, 64-bit
-
-        Implement this, and/or DJB2.
-        """
-
-        # Your code here
-
+        return float(self.size) / (len(self.bucket))
 
     def djb2(self, key):
         """
@@ -63,14 +56,17 @@ class HashTable:
         Implement this, and/or FNV-1.
         """
         # Your code here
-
+        hash = 5381
+        for x in key:
+            hash = ((hash << 5) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
 
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
         between within the storage capacity of the hash table.
         """
-        #return self.fnv1(key) % self.capacity
+        # return self.fnv1(key) % self.capacity
         return self.djb2(key) % self.capacity
 
     def put(self, key, value):
@@ -83,6 +79,27 @@ class HashTable:
         """
         # Your code here
 
+        # ------ FIRST DAY ------
+        # index = self.hash_index(key)
+        # self.bucket[index] = value
+
+        # ------ SECOND DAY ------
+        index = self.hash_index(key)
+        if self.bucket[index] == None:
+            self.size += 1
+            self.bucket[index] = HashTableEntry(key, value)
+        else:
+            self.size += 1
+            cur = self.bucket[index]
+            while True:
+                if cur.key == key:
+                    cur.key = key
+                    cur.value = value
+                    return
+                if cur.next == None:
+                    break
+                cur = cur.next
+            cur.next = HashTableEntry(key, value)
 
     def delete(self, key):
         """
@@ -94,6 +111,31 @@ class HashTable:
         """
         # Your code here
 
+        # ------ FIRST DAY ------
+        # index = self.hash_index(key)
+        # self.bucket[index] = None
+
+        # ------ SECOND DAY ------
+        index = self.hash_index(key)
+        cur = self.bucket[index]
+        prev = None
+
+        while cur is not None and cur.key != key:
+            prev = cur
+            cur = cur.next
+
+        if cur is None:
+            return None
+        else:
+            self.size -= 1
+            result = cur.value
+
+            if prev is None:
+                self.bucket[index] = cur.next
+            else:
+                prev.next = prev.next.next
+
+            return result
 
     def get(self, key):
         """
@@ -105,6 +147,20 @@ class HashTable:
         """
         # Your code here
 
+        # ------ FIRST DAY ------
+        # index = self.hash_index(key)
+        # return self.bucket[index]
+
+        # ------ SECOND DAY ------
+        index = self.hash_index(key)
+        cur = self.bucket[index]
+        while cur is not None and cur.key != key:
+            cur = cur.next
+        
+        if cur is None:
+            return None
+        else:
+            return cur.value
 
     def resize(self, new_capacity):
         """
@@ -114,7 +170,6 @@ class HashTable:
         Implement this.
         """
         # Your code here
-
 
 
 if __name__ == "__main__":
